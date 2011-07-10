@@ -1,0 +1,5 @@
+      <h4><%= link_to variant.product.name,  product_path(variant.product) %>
+      <%= variant.sku %></h4>
+      <%= variant_options variant %><br>
+      <%= raw( truncate(variant.product.description, :length => 100, :omission => "...") ) %>
+
