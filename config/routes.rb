@@ -1,4 +1,14 @@
 Rails.application.routes.draw do
-  # Add your extension routes here
-  match "/products/update_price/:id" => "products#update_price"
+  namespace :admin do
+    resources :products do
+      member do
+        get :update_price
+      end
+    end
+    resources :variants do
+      member do
+        post :regenerate
+      end
+    end
+  end
 end
