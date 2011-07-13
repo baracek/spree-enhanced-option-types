@@ -1,2 +1,2 @@
-<%= observe_form 'options_form', update_price_product_url( @product ), :update => 'current_price' %>
+<%= observe_form 'options_form', :url => { :action => :update_price }, :update => 'current_price' %>
 
