@@ -7,7 +7,7 @@ Rails.application.routes.draw do
       end
       
       resources :variants do
-        member do
+        collection do
           post :regenerate
         end
       end
