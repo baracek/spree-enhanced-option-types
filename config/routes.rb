@@ -1,9 +1,5 @@
 Rails.application.routes.draw do
-  resources :products do
-      member do
-        get :update_price
-      end
-  end
+  match "/products/update_price/:id" => "products#update_price"  
   
   namespace :admin do
     resources :products do
