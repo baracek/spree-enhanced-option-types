@@ -11,6 +11,8 @@ Variant.class_eval do
           a.option_value_id IN ( ? ) 
             AND
           b.product_id = ?
+            AND
+          b.deleted_at is NULL
         GROUP BY
           a.variant_id
         HAVING
