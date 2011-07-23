@@ -5,24 +5,26 @@ Product.class_eval do
   has_many :option_types, :through => :product_option_types, :order => "product_option_types.position ASC"
 
   def do_create_variants(force = false)
-    if (create_variants == "1" || force) && self.option_types.length > 0
+    if (create_variants == "1" || force)      
       Variant.update_all  [ 'updated = ?', false ], ['product_id = ? AND is_master = ? AND deleted_at is NULL', self.id, false]
-      Variant.without_callback( :touch_product ) do
-        generate_variant_combinations.each_with_index do |option_values, index|
-          variant_temp_sku = self.sku.blank? ? "#{self.name.to_url[0..3]}" : "#{self.sku}"
-          option_values.each do | ov |
-             if ov.skupartial && ov.skupartial != ""
-               variant_temp_sku = "#{variant_temp_sku}-#{ov.skupartial}"
-             end
+      if ( self.option_types.length > 0 )
+        Variant.without_callback( :touch_product ) do
+          generate_variant_combinations.each_with_index do |option_values, index|
+            variant_temp_sku = self.sku.blank? ? "#{self.name.to_url[0..3]}" : "#{self.sku}"
+            option_values.each do | ov |
+               if ov.skupartial && ov.skupartial != ""
+                 variant_temp_sku = "#{variant_temp_sku}-#{ov.skupartial}"
+               end
+            end
+            v = Variant.by_option_value_ids(option_values, self.id).first
+            v = v ? v : Variant.create({
+                :product => self,
+                :option_values => option_values,
+                :is_master => false,
+                :sku => variant_temp_sku
+              })
+              v.update_attributes( { :sku => variant_temp_sku, :price => v.calculate_price(self.price), :position => index, :updated => true, :weight => self.master.weight, :height => self.master.height, :width => self.master.width, :depth => self.master.depth } )
           end
-          v = Variant.by_option_value_ids(option_values, self.id).first
-          v = v ? v : Variant.create({
-              :product => self,
-              :option_values => option_values,
-              :is_master => false,
-              :sku => variant_temp_sku
-            })
-            v.update_attributes( { :sku => variant_temp_sku, :price => v.calculate_price(self.price), :position => index, :updated => true, :weight => self.master.weight, :height => self.master.height, :width => self.master.width, :depth => self.master.depth } )
         end
       end
       Variant.update_all ['updated = ?, deleted_at = ?', true, Time.now() ], ['product_id = ? AND updated = ? AND is_master = ?', self.id, false, false]
