@@ -45,6 +45,8 @@
   <% end %>
 </table>
 
+<%= will_paginate(:previous_label => "&#171; #{t('previous')}", :next_label => "#{t('next')} &#187;") %>
+
 <% if @product.options.empty? %>
   <p>
     <%= t("to_add_variants_you_must_first_define") %>  <%= link_to t("option_types"), selected_admin_product_option_types_url(@product) %>
