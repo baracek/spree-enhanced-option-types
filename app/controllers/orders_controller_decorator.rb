@@ -4,7 +4,10 @@ OrdersController.class_eval do
       quantity = params[:quantity].to_i if !params[:quantity].is_a?(Array)
       quantity = params[:quantity][variant_id].to_i if params[:quantity].is_a?(Array)
       option_value_ids = otov.map{|option_type_id, option_value_id| option_value_id}
-      params[:variants] = Hash[ Variant.by_option_value_ids(option_value_ids, product_id).first.id, quantity ]
+      variant_list = Variant.by_option_value_ids(option_value_ids, product_id)
+      if variant_list && variant_list.first
+        params[:variants] = Hash[ variant_list.first.id, quantity ]
+      end
     end if params[:option_values]
 
     @order = current_order(true)

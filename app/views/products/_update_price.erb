@@ -1,2 +1,5 @@
-<span class="price selling update"><%= product_price( @current_variant ) %></span>
-
+<% if @current_variant %>
+   <span class="price selling update"><%= product_price( @current_variant ) %></span>
+<% else %>
+   <span class="price selling update"><%= t(:wrong_combination) %></span>
+<% end %>

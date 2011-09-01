@@ -6,23 +6,13 @@ ProductsController.class_eval do
       quantity = params[:quantity].to_i if !params[:quantity].is_a?(Array)
       quantity = params[:quantity][variant_id].to_i if params[:quantity].is_a?(Array)
       option_value_ids = otov.map{|option_type_id, option_value_id| option_value_id}
-      variant = Variant.by_option_value_ids(option_value_ids, product_id).first
+      variant_list = Variant.by_option_value_ids(option_value_ids, product_id)
+      variant = variant_list ? variant_list.first : nil
     end if params[:option_values]
 
-    puts variant ? variant.id : "object null"
     @current_variant = variant
     puts @current_variant ? @current_variant.id : "object null"
-    if quantity > 0 && variant
-      if Spree::Config[:allow_backorders] == false && quantity > variant.on_hand
-        flash[:error] = t(:stock_to_small) % [variant.on_hand]
-      else
-        render :partial => 'update_price'
-      end
-    elsif quantity > 0
-      flash[:error] = t(:wrong_combination)
-    else
-      flash[:error] = t(:wrong_quantity)
-    end
+    render :partial => 'update_price'
   end
   
   def show_with_variant_override
